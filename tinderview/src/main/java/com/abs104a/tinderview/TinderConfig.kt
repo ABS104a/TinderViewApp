@@ -1,4 +1,4 @@
-package com.abs104a.tinderview.tinder
+package com.abs104a.tinderview
 
 open class TinderConfig protected constructor(val duration: Long, val rotate: Float) {
 

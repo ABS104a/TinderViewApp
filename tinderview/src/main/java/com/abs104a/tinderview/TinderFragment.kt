@@ -1,4 +1,4 @@
-package com.abs104a.tinderview.tinder
+package com.abs104a.tinderview
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
-import com.abs104a.tinderview.R
 
 class TinderFragment<T> : Fragment() {
 
@@ -29,7 +28,7 @@ class TinderFragment<T> : Fragment() {
     var getCardView: (obj: T, viewGroup: ViewGroup) -> Unit = { _, _ -> }
     var onSwipeSelected: (state: STATE, obj: T, view: View) -> Unit = { _, _, _ -> }
     var onSwipeCompleted: (state: STATE, obj: T, view: View) -> Unit = { _, _, _ -> }
-    var onChangeSwipingStatus: (state: STATE, obj: T, view: View) -> Unit = {_, _, _ -> }
+    var onChangeSwipingStatus: (state: STATE, obj: T, view: View) -> Unit = { _, _, _ -> }
 
     private var frameLayout: FrameLayout? = null
     private var items = mutableListOf<T>()
@@ -37,7 +36,7 @@ class TinderFragment<T> : Fragment() {
     // デフォルトのConfigを追加
     private var config : TinderConfig = TinderConfig.ConfigBuilder().build()
     private var moveFlag = 0
-    private var oldState = STATE.NONE
+    private var oldState = Companion.STATE.NONE
     private val touchListener = object : View.OnTouchListener {
 
         private var targetLocalX: Int = 0
@@ -100,28 +99,28 @@ class TinderFragment<T> : Fragment() {
 
                     // ステート
                     if (targetLocalX > target.width * JUDGE_TH) {
-                        if (oldState != STATE.RIGHT){
-                            onChangeSwipingStatus(STATE.RIGHT, items[0],target)
-                            oldState = STATE.RIGHT
+                        if (oldState != Companion.STATE.RIGHT){
+                            onChangeSwipingStatus(Companion.STATE.RIGHT, items[0],target)
+                            oldState = Companion.STATE.RIGHT
                         }
                     } else if (0 - targetLocalX > target.width * JUDGE_TH) {
-                        if (oldState != STATE.LEFT){
-                            onChangeSwipingStatus(STATE.LEFT, items[0],target)
-                            oldState = STATE.LEFT
+                        if (oldState != Companion.STATE.LEFT){
+                            onChangeSwipingStatus(Companion.STATE.LEFT, items[0],target)
+                            oldState = Companion.STATE.LEFT
                         }
                     } else if (targetLocalY > target.height * JUDGE_TH) {
-                        if (oldState != STATE.BOTTOM){
-                            onChangeSwipingStatus(STATE.BOTTOM, items[0],target)
-                            oldState = STATE.BOTTOM
+                        if (oldState != Companion.STATE.BOTTOM){
+                            onChangeSwipingStatus(Companion.STATE.BOTTOM, items[0],target)
+                            oldState = Companion.STATE.BOTTOM
                         }
                     } else if (0 - targetLocalY > target.height * JUDGE_TH) {
-                        if (oldState != STATE.TOP) {
-                            onChangeSwipingStatus(STATE.TOP, items[0],target)
-                            oldState = STATE.TOP
+                        if (oldState != Companion.STATE.TOP) {
+                            onChangeSwipingStatus(Companion.STATE.TOP, items[0],target)
+                            oldState = Companion.STATE.TOP
                         }
-                    } else if (oldState != STATE.NONE){
-                        onChangeSwipingStatus(STATE.NONE, items[0],target)
-                        oldState = STATE.NONE
+                    } else if (oldState != Companion.STATE.NONE){
+                        onChangeSwipingStatus(Companion.STATE.NONE, items[0],target)
+                        oldState = Companion.STATE.NONE
                     }
                 }
 
@@ -129,7 +128,8 @@ class TinderFragment<T> : Fragment() {
 
                     if (event.action == MotionEvent.ACTION_UP &&
                             moveFlag < MOVE_TIME_TH &&
-                            Math.abs(targetLocalX + targetLocalY) < MOVE_TH) {
+                            Math.abs(targetLocalX + targetLocalY) < MOVE_TH
+                    ) {
                         // クリックイベントの処理
                         target.performClick()
                     }
@@ -140,56 +140,56 @@ class TinderFragment<T> : Fragment() {
                         getTopView() != target -> {
                             // キャンセル
                             viewAnimation(target, 0f - target.left, 0f - target.top, 0f ,Runnable{
-                                onSwipeCompleted(STATE.NONE, items[0],target)
+                                onSwipeCompleted(Companion.STATE.NONE, items[0],target)
                             })
-                            onSwipeSelected(STATE.NONE, items[0],target)
+                            onSwipeSelected(Companion.STATE.NONE, items[0],target)
                         }
                         targetLocalX > target.width * JUDGE_TH -> {
                             // 右
                             val item = items.removeAt(0)
-                            onSwipeSelected(STATE.RIGHT,item,target)
+                            onSwipeSelected(Companion.STATE.RIGHT,item,target)
                             val margin = if (target.width < target.height) target.height - target.width else 0
                             viewAnimation(target, (target.width + margin).toFloat(), ((target.width * targetLocalY) / targetLocalX).toFloat(), config.rotate,Runnable {
-                                onSwipeCompleted(STATE.RIGHT,item,target)
+                                onSwipeCompleted(Companion.STATE.RIGHT,item,target)
                                 changeCard()
                             })
                         }
                         0 - targetLocalX > target.width * JUDGE_TH -> {
                             // 左
                             val item = items.removeAt(0)
-                            onSwipeSelected(STATE.LEFT,item,target)
+                            onSwipeSelected(Companion.STATE.LEFT,item,target)
                             val margin = if (target.width < target.height) target.height - target.width else 0
                             viewAnimation(target, (0 - target.width - margin).toFloat(), ((target.width * targetLocalY) / (0 - targetLocalX)).toFloat(),0 - config.rotate, Runnable {
-                                onSwipeCompleted(STATE.LEFT,item,target)
+                                onSwipeCompleted(Companion.STATE.LEFT,item,target)
                                 changeCard()
                             })
                         }
                         targetLocalY > target.height * JUDGE_TH -> {
                             // 下
                             val item = items.removeAt(0)
-                            onSwipeSelected(STATE.BOTTOM,item,target)
+                            onSwipeSelected(Companion.STATE.BOTTOM,item,target)
                             val margin = if (target.width < target.height) 0 else target.width - target.height
                             viewAnimation(target, ((target.height * targetLocalX) / targetLocalY).toFloat(), (target.height + margin).toFloat(),config.rotate, Runnable {
-                                onSwipeCompleted(STATE.BOTTOM,item,target)
+                                onSwipeCompleted(Companion.STATE.BOTTOM,item,target)
                                 changeCard()
                             })
                         }
                         0 - targetLocalY > target.height * JUDGE_TH -> {
                             // 上
                             val item = items.removeAt(0)
-                            onSwipeSelected(STATE.TOP,item,target)
+                            onSwipeSelected(Companion.STATE.TOP,item,target)
                             val margin = if (target.width < target.height) 0 else target.width - target.height
                             viewAnimation(target, ((target.height * targetLocalX) / (0 - targetLocalY)).toFloat(), (0 - target.height - margin).toFloat(),0 - config.rotate, Runnable {
-                                onSwipeCompleted(STATE.TOP,item,target)
+                                onSwipeCompleted(Companion.STATE.TOP,item,target)
                                 changeCard()
                             })
                         }
                         else -> {
                             // キャンセルされた時
                             viewAnimation(target, 0f - target.left, 0f - target.top,0f, Runnable{
-                                onSwipeCompleted(STATE.NONE, items[0],target)
+                                onSwipeCompleted(Companion.STATE.NONE, items[0],target)
                             })
-                            onSwipeSelected(STATE.NONE, items[0],target)
+                            onSwipeSelected(Companion.STATE.NONE, items[0],target)
                         }
                     }
                     // リセットする．
@@ -197,7 +197,7 @@ class TinderFragment<T> : Fragment() {
                     screenY = 0f
                     targetLocalX = 0
                     targetLocalY = 0
-                    oldState = STATE.NONE
+                    oldState = Companion.STATE.NONE
                 }
             }
             return true

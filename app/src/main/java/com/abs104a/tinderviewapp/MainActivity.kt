@@ -7,16 +7,22 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.abs104a.tinderview.tinder.TinderConfig
-import com.abs104a.tinderview.tinder.TinderFragment
+import com.abs104a.tinderview.TinderConfig
+import com.abs104a.tinderview.TinderFragment
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     data class SampleData(val string: String, val color: Int)
 
+    fun getTextView(): TextView = textview_guide
+
+    fun resetTextView() {getTextView().text = TinderFragment.Companion.STATE.NONE.name}
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        resetTextView()
 
         val dataList = mutableListOf<SampleData>().also {
             it.add(SampleData("test1", ContextCompat.getColor(this, R.color.turquoise)))
@@ -51,10 +57,12 @@ class MainActivity : AppCompatActivity() {
                 onSwipeCompleted = { state, data, _ ->
                     val pos = dataList.indexOf(data)
                     Log.v("onSwipeCompleted", "state: ${state.name}, string: ${data.string}, pos: $pos")
+                    resetTextView()
                 }
                 onChangeSwipingStatus = { state, data, _ ->
                     val pos = dataList.indexOf(data)
                     Log.v("onChangeSwipingStatus", "state: ${state.name}, string: ${data.string}, pos: $pos")
+                    getTextView().text = state.name
                 }
             }, "TinderFragment")
             .commit()
